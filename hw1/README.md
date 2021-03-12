@@ -1,5 +1,4 @@
-# HW's and labs Genetic Algos
-## HW1
+# HW1
  File: dz1.cpp
 
  Find maximum of function: cos(exp(x)) / sin(log(x))
