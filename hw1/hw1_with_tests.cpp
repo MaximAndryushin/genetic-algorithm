@@ -7,11 +7,11 @@ using ld = long double;
 
 constexpr ld _MIN = 2; // Минимальное значение аргумента
 constexpr ld _MAX = 4; // Максимальное значение аргумента
-constexpr int _P = 40; // Вероятность конвергенции и мутации в %
+constexpr int _P = 50; // Вероятность конвергенции и мутации в %
 constexpr int _NUMBER_OF_POINTS = 1 << 20; // Количество точек разбиения отрезка возможных значений аргумента
 constexpr int _LEN = 20; // Длина хромосомы в битах
-constexpr int _POPULATION_SIZE = 30; // Размер популяции
-constexpr int BREAKPOINT = 15; // Условие остановки алгоритма
+constexpr int _POPULATION_SIZE = 20; // Размер популяции
+constexpr int BREAKPOINT = 10; // Условие остановки алгоритма
 constexpr int ELITE = 5; // Количесвто особей, не подврегающихся конвергенции
 
 ld MIN, MAX; // Минимальное/максимальное значение аргумента
@@ -20,6 +20,7 @@ int NUMBER_OF_POINTS;  // Количество точек разбиения о�
 int LEN; // Длина хромосомы в битах
 int POPULATION_SIZE; // Размер популяции
 int POPULATION_NUMBER;
+
 
 // Объект, необходимый для случайной генерации числел
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
@@ -56,7 +57,7 @@ string to_str(int x) {
 // Структура, представляющая особь
 struct gen_ind {
   gen_ind() {
-    gen = to_g(rng() % (NUMBER_OF_POINTS + 1));
+    gen = to_g(rng() % LEN);
   }
 
   gen_ind(int gen) : gen(gen) {};
@@ -126,13 +127,6 @@ ostream& operator<<(std::ostream& out, const vector<T>& obj) {
   return out;
 }
 
-// Функция вывода вектора в представлении листа для питона
-template<typename T>
-ostream& operator<<(std::ostream& out, const pair<T, T>& obj) {
-  out << '(' << obj.first << ", " << obj.second << ')' << endl;
-  return out;
-}
-
 // Репродукция
 void reproduction(vector<gen_ind>& pop) {
   if (REPRODUCTION) {
@@ -169,8 +163,7 @@ void mutation(vector<gen_ind>& pop) {
       gen.mutate();
 }
 
-// возвращает лучшие особи для каждой популяцииы
-vector<gen_ind> genetic_algorithm() {
+gen_ind genetic_algorithm() {
   // Вычисление длины хромосомы в битах
   LEN = 0;
   while((1 << LEN) < NUMBER_OF_POINTS)
@@ -180,7 +173,6 @@ vector<gen_ind> genetic_algorithm() {
   
   // Генерация начальной популяции
   vector<gen_ind> pop(POPULATION_SIZE);
-  vector<gen_ind> answer;
 
   /* 
   Точка останова
@@ -212,7 +204,6 @@ vector<gen_ind> genetic_algorithm() {
       res = pop.front();
       num = 0;
     }
-    answer.emplace_back(pop.front());
 
     // Репродукция
     reproduction(pop);
@@ -225,7 +216,7 @@ vector<gen_ind> genetic_algorithm() {
 
   } while(num != BREAKPOINT); // Проверка условия остановки алгоритма
 
-  return answer;
+  return res;
 }
 
 int main(int argc, char *argv[]) {
@@ -245,17 +236,40 @@ int main(int argc, char *argv[]) {
     NUMBER_OF_POINTS = _NUMBER_OF_POINTS;
     POPULATION_SIZE = _POPULATION_SIZE;
   }
-  vector<gen_ind> ans;
-  cout << "Наилучшая особь: " << endl << (ans = genetic_algorithm()) << endl;
 
-  ld real_ans = -1e9, val; 
-  int id = 0;
-  for (int i = 0; i <= NUMBER_OF_POINTS; i++) {
-    val = func(MIN + i * (MAX - MIN) / NUMBER_OF_POINTS);
-    if (real_ans < val)
-      real_ans = val, id = i;
+  int POP = 100;
+  int REPEATS = 20;
+  vector<ld> maxs, times, pops;
+  vector<int> sizes;
+  for (int i = 1; i <= POP; i++) {
+    sizes.push_back(i);
+    POPULATION_SIZE = i;
+    ld ans = 0;
+    ld t = 0;
+    ld pop_num = 0;
+    for (int j = 0; j < REPEATS; j++) {
+      auto start = chrono::high_resolution_clock::now();
+      ans += genetic_algorithm().eval();
+      auto end = chrono::high_resolution_clock::now();
+      t += (chrono::duration_cast<chrono::duration<double>>(end - start)).count();
+      pop_num += POPULATION_NUMBER;
+    }
+    maxs.push_back(ans / REPEATS);
+    times.push_back(t / REPEATS);
+    pops.push_back(pop_num / REPEATS);
+    //cout << "Наилучшая особь: " << endl << genetic_algorithm() << endl;
   }
-  cout << "Лучший ответ при такой точности: " << endl << gen_ind(to_g(id));
+
+  cout << sizes << maxs << times << pops;
+  
+  // ld real_ans = -1e9, val; 
+  // int id = 0;
+  // for (int i = 0; i <= NUMBER_OF_POINTS; i++) {
+  //   val = func(MIN + i * (MAX - MIN) / NUMBER_OF_POINTS);
+  //   if (real_ans < val)
+  //     real_ans = val, id = i;
+  // }
+  // cout << "Лучший ответ при такой точности: " << endl << gen_ind(to_g(id));
 
   return 0;
 }
