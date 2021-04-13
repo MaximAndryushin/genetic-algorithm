@@ -23,7 +23,7 @@ istream& operator>>(istream& in, vector<int>& vec) {
 }
 
 int main() {
-  freopen("zhopa.txt", "r", stdin);
+  freopen("../gen_alg/lab/vectors_and_max_values.txt", "r", stdin);
   freopen("../gen_alg/lab/knapsack_problems.txt", "w", stdout);
   vector<int> id_sol(NUMBER_OF_SOLUTIONS);
   iota(id_sol.begin(), id_sol.end(), 1);
@@ -33,10 +33,11 @@ int main() {
     vector<float> elements_ratio;
     cin >> vec;
     for (int j = 0; j < NUMBER_OF_SOLUTIONS; j++) {
-      int number_of_elements = MIN_NUMBER_OF_ELEMENTS + rng() % (MAX_NUMBER_OF_ELEMENTS - MIN_NUMBER_OF_ELEMENTS + 1);
+      int number_of_elements = MIN_NUMBER_OF_ELEMENTS + rng() % (MAX_NUMBER_OF_ELEMENTS - MIN_NUMBER_OF_ELEMENTS + 1); // случайный выбор кол-ва эл-ов
       set<int> st;
       int index;
       long long sum = 0;
+      // генерация слуйчайных эл-ов
       while(st.size() != number_of_elements) {
         index = rng() % SIZE;
         st.insert(index);
