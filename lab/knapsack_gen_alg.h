@@ -7,9 +7,17 @@ using namespace std;
 using ll = long long;
 
 constexpr int _P = 40; // Вероятность конвергенции и мутации в %
-constexpr int _POPULATION_SIZE = 30; // Размер популяции
-constexpr int BREAKPOINT = 15; // Условие остановки алгоритма
-constexpr int ELITE = 5; // Количесвто особей, не подврегающихся конвергенции
+constexpr int _POPULATION_SIZE = 500; // Размер популяции
+constexpr int BREAKPOINT = 20; // Условие остановки алгоритма
+constexpr int ELITE = 5; // Количесвто особей, не подвергающихся конвергенции
+
+enum breakpoint_type {
+  time_limit,
+  iterations,
+  zero
+};
+
+string enum_to_string(breakpoint_type t);
 
 // Фитнесс-функция
 ll func();
@@ -50,13 +58,9 @@ struct gen_ind {
   // Кроссинговер хромосомы
   void crossingover(const gen_ind& o);
 
-  bool operator <(const gen_ind& o) const {
-    return eval() < o.eval();
-  }
+  bool operator <(const gen_ind& o) const;
 
-  bool operator >(const gen_ind& o) const {
-    return eval() > o.eval();
-  }
+  bool operator >(const gen_ind& o) const;
 
   bool operator ==(const gen_ind& o) const {
     return gen == o.gen;
@@ -83,7 +87,7 @@ void crossingover(vector<gen_ind>& pop);
 void mutation(vector<gen_ind>& pop);
 
 // возвращает лучшие особи для каждой популяцииы
-vector<gen_ind> genetic_algorithm();
+pair<vector<gen_ind>, breakpoint_type> genetic_algorithm(double time);
 
 
 #endif

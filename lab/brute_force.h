@@ -9,6 +9,6 @@ using ll = long long;
 void print_indices_of_set(int mask);
 
 // Перебор всех возможных подмножеств предметов
-std::vector<int> brute_force(const std::vector<int>& knap_vec, const long long& target);
+std::pair<vector<int>, double> brute_force(const std::vector<int>& knap_vec, const long long& target);
 
 #endif

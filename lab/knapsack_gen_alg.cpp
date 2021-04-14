@@ -3,10 +3,21 @@
 int P; // Вероятность конвергенции и мутации в %
 int LEN; // Длина хромосомы в битах
 int POPULATION_SIZE; // Размер популяции
-int POPULATION_NUMBER;
+int POPULATION_NUMBER; // Номер популяции
 
 // Объект, необходимый для случайной генерации числел
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
+string enum_to_string(breakpoint_type t) {
+  switch (t) {
+    case ::time_limit:
+      return "time";
+    case ::iterations: 
+      return "iterations";
+    case ::zero:
+      return "zero";
+  }
+}
 
 // Переводит число в бинарную строку
 string to_str(int x) {
@@ -49,7 +60,7 @@ gen_ind::gen_ind() {
   truncate();
 }
 
-// Вычисление целевой (фитнесс) функции
+// Вычисление фитнесс функции
 ll gen_ind::eval() const {
   return fitness_function(to_sum());
 }
@@ -91,6 +102,22 @@ void gen_ind::crossingover(const gen_ind& o) {
     gen = gen ^ (gen & (1 << id)) ^ (o.gen & (1 << id));
   }
   truncate();
+}
+
+bool gen_ind::operator<(const gen_ind& o) const {
+  ll l = eval();
+  ll r = o.eval();
+  if (l != r)
+    return l < r;
+  return get() < o.get();
+}
+
+bool gen_ind::operator>(const gen_ind& o) const {
+  ll l = eval();
+  ll r = o.eval();
+  if (l != r)
+    return l > r;
+  return get() > o.get();
 }
 
 // Функция вывода объекта особи
@@ -138,7 +165,8 @@ void mutation(vector<gen_ind>& pop) {
 }
 
 // возвращает лучшие особи для каждой популяцииы
-vector<gen_ind> genetic_algorithm() {
+pair<vector<gen_ind>, breakpoint_type> genetic_algorithm(double time) {
+  auto start = chrono::high_resolution_clock::now();
   // Инициализация необходимых параметров
   LEN = gen_ind::weights.size();
   POPULATION_SIZE = _POPULATION_SIZE;
@@ -188,8 +216,17 @@ vector<gen_ind> genetic_algorithm() {
 
     // Мутация
     mutation(pop);
+    
+    // Проверка значения фитнесс функции
+    if (res.eval() == 0)
+      return { answer, ::zero };
+
+    auto end = chrono::high_resolution_clock::now();
+    if ((chrono::duration_cast<chrono::duration<double>>(end - start)).count() > 2 * time)
+      return { answer, ::time_limit };
 
   } while(num != BREAKPOINT); // Проверка условия остановки алгоритма
 
-  return answer;
+  swap(answer.back(), res);
+  return { answer, ::iterations };
 }

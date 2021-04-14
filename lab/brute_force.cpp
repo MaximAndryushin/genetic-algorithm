@@ -1,7 +1,9 @@
 #include "brute_force.h"
 
 // Перебор всех возможных подмножеств предметов
-vector<int> brute_force(const vector<int>& knap_vec, const ll& target) {
+pair<vector<int>, double> brute_force(const vector<int>& knap_vec, const ll& target) {
+  auto start = chrono::high_resolution_clock::now();
+  double first_solution_time = 0;
   int sz = knap_vec.size();
   vector<int> solutions;
   for (int i = 1; i < (1 << sz); i++) {
@@ -10,8 +12,13 @@ vector<int> brute_force(const vector<int>& knap_vec, const ll& target) {
       if ((i >> j) & 1)
         sum += knap_vec[j];
     }
-    if (sum == target)
-      solutions.push_back(i);
+    if (sum == target) {
+      if (solutions.size() == 0) {
+        auto end = chrono::high_resolution_clock::now();
+        first_solution_time = (chrono::duration_cast<chrono::duration<double>>(end - start)).count();
+      } 
+      solutions.push_back(i); 
+    }
   }
-  return solutions;
+  return { solutions, first_solution_time };
 }

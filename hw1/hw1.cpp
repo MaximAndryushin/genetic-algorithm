@@ -102,6 +102,8 @@ struct gen_ind {
 
   private:
 
+  void truncate();
+
   int gen; // Представление хромосомы в виде кода Грея
 };
 

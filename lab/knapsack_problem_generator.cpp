@@ -1,13 +1,4 @@
-#include <bits/stdc++.h>
-
-using namespace std;
-
-// Константы
-constexpr int SIZE = 24;
-constexpr int NUMBER_OF_VECTORS = 50;
-constexpr int NUMBER_OF_SOLUTIONS = 10;
-constexpr int MIN_NUMBER_OF_ELEMENTS = 0.1 * SIZE; // округлил вниз
-constexpr int MAX_NUMBER_OF_ELEMENTS = 0.5 * SIZE; // округление не нужно
+#include "knapsack_problem_generator.h"
 
 // Объект, необходимый для случайной генерации числел
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
