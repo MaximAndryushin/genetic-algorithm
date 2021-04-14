@@ -9,5 +9,6 @@ Find maximum of function: cos(exp(x)) / sin(log(x))
 Knapsack problem
 
 brute force solution
+
 genetic algorithm solution
  
